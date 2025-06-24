@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-service
+  template:
+    metadata:
+      labels:
+        app: payments-service
+    spec:
+      containers:
+        - name: payments-service
+          image: juanlopezaranzazu388/ds3-payments-service:latest
+          ports:
+            - containerPort: 8085
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            - name: EUREKA_SERVER_HOST
+              value: "eureka-service"
+            - name: EUREKA_SERVER_PORT
+              value: "8761"
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: payments-secret
+                  key: DB_HOST
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: payments-secret
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: payments-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: payments-secret
+                  key: DB_PASSWORD
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: payments-secret
+                  key: STRIPE_SECRET_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: payments-secret
+                  key: STRIPE_WEBHOOK_SECRET
+            - name: STRIPE_SUCCESS_URL
+              value: "http://localhost:30085/api/v1/stripe/success"
+            - name: STRIPE_CANCEL_URL
+              value: "http://localhost:30085/api/v1/stripe/cancel"
+
