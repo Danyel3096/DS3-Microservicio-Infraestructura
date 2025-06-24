@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deliveries-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deliveries-service
+  template:
+    metadata:
+      labels:
+        app: deliveries-service
+    spec:
+      containers:
+        - name: deliveries-service
+          image: juanlopezaranzazu388/ds3-deliveries-service:latest
+          ports:
+            - containerPort: 8084
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            - name: EUREKA_SERVER_HOST
+              value: "eureka-service"
+            - name: EUREKA_SERVER_PORT
+              value: "8761"
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: deliveries-secret
+                  key: DB_HOST
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: deliveries-secret
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: deliveries-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: deliveries-secret
+                  key: DB_PASSWORD
